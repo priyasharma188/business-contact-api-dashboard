@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Business Contact API Dashboard</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+    <!-- HEADER -->
+
+    <header>
+
+        <div>
+
+            <h1>
+                Business Contact Dashboard
+            </h1>
+
+            <p>
+                API & File Management System
+            </p>
+
+        </div>
+
+
+        <a
+            href="/export"
+            class="export-btn"
+        >
+            Export Contacts
+        </a>
+
+    </header>
+
+
+
+    <!-- FLASH MESSAGE -->
+
+    {% with messages = get_flashed_messages() %}
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div class="message">
+
+                    {{ message }}
+
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+
+    <!-- FILE UPLOAD -->
+
+    <section class="card">
+
+        <h2>
+            Upload File
+        </h2>
+
+        <p>
+            Upload your PDF, CSV or Excel file from your computer.
+        </p>
+
+
+        <form
+            action="/upload"
+            method="POST"
+            enctype="multipart/form-data"
+        >
+
+            <input
+                type="file"
+                name="file"
+                accept=".pdf,.csv,.xlsx"
+                required
+            >
+
+
+            <button type="submit">
+                Upload File
+            </button>
+
+        </form>
+
+    </section>
+
+
+
+    <!-- UPLOADED FILES -->
+
+    <section class="card">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    Uploaded Files
+                </h2>
+
+                <p>
+                    Manage your uploaded documents.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        {% if files %}
+
+        <div class="file-list">
+
+            {% for file in files %}
+
+            <div class="file-item">
+
+
+                <div class="file-icon">
+
+                    {% if file.type == "PDF" %}
+
+                        📕
+                    
+                    {% elif file.type == "CSV" %}
+
+                        📊
+
+                    {% elif file.type == "XLSX" %}
+
+                        📗
+
+                    {% else %}
+
+                        📄
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="file-info">
+
+                    <strong>
+                        {{ file.name }}
+                    </strong>
+
+                    <span>
+                        {{ file.type }} • {{ file.size }}
+                    </span>
+
+                </div>
+
+
+                <div class="file-actions">
+
+                    <a
+                        href="/files/{{ file.name }}"
+                        target="_blank"
+                    >
+                        View
+                    </a>
+
+
+                    <a
+                        href="/download/{{ file.name }}"
+                    >
+                        Download
+                    </a>
+
+
+                    <form
+                        action="/delete/{{ file.name }}"
+                        method="POST"
+                    >
+
+                        <button
+                            type="submit"
+                            class="delete-btn"
+                        >
+                            Delete
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="empty">
+
+            No files uploaded yet.
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+
+
+    <!-- API SECTION -->
+
+    <section class="card">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    API Contacts
+                </h2>
+
+                <p>
+                    Live data fetched from REST API.
+                </p>
+
+            </div>
+
+            <span class="api-status">
+                ● API Connected
+            </span>
+
+        </div>
+
+
+
+        <!-- SEARCH -->
+
+        <form
+            method="GET"
+            action="/"
+            class="search-form"
+        >
+
+            <input
+                type="text"
+                name="search"
+                placeholder="Search name, email or country..."
+                value="{{ search }}"
+            >
+
+            <button type="submit">
+                Search
+            </button>
+
+            <a href="/">
+                Clear
+            </a>
+
+        </form>
+
+
+
+        <!-- TABLE -->
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Name
+                        </th>
+
+                        <th>
+                            Email
+                        </th>
+
+                        <th>
+                            Phone
+                        </th>
+
+                        <th>
+                            Country
+                        </th>
+
+                        <th>
+                            Source
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for contact in contacts %}
+
+                    <tr>
+
+                        <td>
+                            <strong>
+                                {{ contact.name }}
+                            </strong>
+                        </td>
+
+                        <td>
+                            {{ contact.email }}
+                        </td>
+
+                        <td>
+                            {{ contact.phone }}
+                        </td>
+
+                        <td>
+                            {{ contact.country }}
+                        </td>
+
+                        <td>
+
+                            <span class="badge">
+                                {{ contact.source }}
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                    {% else %}
+
+                    <tr>
+
+                        <td
+                            colspan="5"
+                            class="empty"
+                        >
+                            No contacts found.
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+</div>
+
+</body>
+
+</html>
